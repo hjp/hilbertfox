@@ -6,17 +6,22 @@
             Hilbert
         </title>
         <script>
-            function hilbert() {
+            function sleep (time) {
+                return new Promise((resolve) => setTimeout(resolve, time));
+            }
+
+            async function hilbert() {
                 var canvas = document.getElementById("hilbert");
                 var ctx = canvas.getContext("2d");
 
-                for (var depth = 0; depth < 4; depth++) {
+                for (var depth = 0; depth < 5; depth++) {
                     ctx.fillStyle = 'rgba(256, 256, 256, 0.3)';
                     size = 1024;
                     ctx.fillRect(0, 0, size, size);
                     ctx.beginPath()
                     hilbert1(ctx, depth, size/2, size/2, size/4, 0, false);
                     ctx.stroke();
+                    await(sleep(500));
                 }
 
             }
@@ -41,8 +46,6 @@
                     hilbert1(ctx, depth-1, +size, -size, size/2, +1, false);
                 }
                 ctx.restore();
-
-                
             }
 
         </script>
