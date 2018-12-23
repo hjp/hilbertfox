@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>
+            Hilbert
+        </title>
+        <style>
+            canvas {
+                box-shadow: 0 0 1em 1em;
+            }
+        </style>
+        <script>
+            function hilbert() {
+                var canvas = document.getElementById("hilbert");
+                var ctx = canvas.getContext("2d");
+
+                hilbert1(ctx, 3, 256, 256, 128, 0);
+
+            }
+
+            function hilbert1(ctx, depth, x, y, size, orientation) {
+                ctx.save()
+                ctx.translate(x, y);
+                ctx.rotate(orientation * (Math.PI/2));
+                ctx.beginPath()
+                ctx.moveTo(- size, -size);
+                ctx.lineTo(- size, +size);
+                ctx.lineTo(+ size, +size);
+                ctx.lineTo(+ size, -size);
+                ctx.stroke();
+
+                if (depth > 0) {
+                    hilbert1(ctx, depth-1, -size, -size, size/2, -1);
+                    ctx.beginPath()
+                    ctx.moveTo(-size*3/2, -size/2);
+                    ctx.lineTo(-size*3/2, +size/2);
+                    ctx.stroke();
+                    hilbert1(ctx, depth-1, -size, +size, size/2, 0);
+                    ctx.beginPath()
+                    ctx.moveTo(-size/2, +size*1/2);
+                    ctx.lineTo(+size/2, +size*1/2);
+                    ctx.stroke();
+                    hilbert1(ctx, depth-1, +size, +size, size/2, 0);
+                    ctx.beginPath()
+                    ctx.moveTo(+size*3/2, -size/2);
+                    ctx.lineTo(+size*3/2, +size/2);
+                    ctx.stroke();
+                    hilbert1(ctx, depth-1, +size, -size, size/2, +1);
+                }
+                ctx.restore();
+
+                
+            }
+
+        </script>
+    </head>
+    <body onload="hilbert()">
+        <canvas id="hilbert" width=512 height=512>
+
+        </canvas>
+    </body>
+</html>
