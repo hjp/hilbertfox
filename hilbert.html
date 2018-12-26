@@ -12,41 +12,68 @@
         </style>
         <script>
             function hilbert() {
-                var canvas = document.getElementById("hilbert");
-                var ctx = canvas.getContext("2d");
+                h = hilbert1(5,
+                             {x: 256, y: 256},
+                             {x: 256, y:   0},
+                             {x:   0, y: 256})
 
-                for (var depth = 0; depth < 5; depth++) {
-                    ctx.fillStyle = 'rgba(256, 256, 256, 0.3)';
-                    ctx.fillRect(0, 0, 512, 512);
-                    ctx.beginPath()
-                    hilbert1(ctx, depth, 256, 256, 128, 0, false);
-                    ctx.stroke();
+                const canvas = document.getElementById("hilbert");
+                const ctx = canvas.getContext("2d");
+                ctx.scale(1, -1)
+                ctx.translate(0, -512)
+
+                for (let i = 0; i < h.length; i++) {
+                    window.setTimeout(
+                        function(i) {
+                            //console.log(s)
+
+                            // redrawing the whole path is not the most elegant way to continue
+                            // where we left off, but it works
+                            ctx.beginPath()
+                            for (let j = 0; j <= i; j++) {
+                                s = h[j]
+                                ctx.lineTo(s.c.x - s.x.x/2 + s.y.x/2, s.c.y - s.x.y/2 + s.y.y/2)
+                                ctx.lineTo(s.c.x - s.x.x/2 - s.y.x/2, s.c.y - s.x.y/2 - s.y.y/2)
+                                ctx.lineTo(s.c.x + s.x.x/2 - s.y.x/2, s.c.y + s.x.y/2 - s.y.y/2)
+                                ctx.lineTo(s.c.x + s.x.x/2 + s.y.x/2, s.c.y + s.x.y/2 + s.y.y/2)
+                            }
+                            ctx.stroke();
+                        },
+                        i * 50,
+                        i
+                    );
                 }
 
             }
 
-            function hilbert1(ctx, depth, x, y, size, orientation, mirror) {
-                console.log(depth, x, y, size, orientation);
-                ctx.save()
-                ctx.translate(x, y);
-                ctx.rotate(orientation * (Math.PI/2));
-                if (mirror) {
-                    ctx.scale(-1, 1);
-                }
+            function hilbert1(depth, center, x, y) {
+                console.log(depth, center, x, y);
                 if (depth == 0) {
-                    ctx.lineTo(- size, -size);
-                    ctx.lineTo(- size, +size);
-                    ctx.lineTo(+ size, +size);
-                    ctx.lineTo(+ size, -size);
+                    return [{c: center, x: x, y: y}]
                 } else {
-                    hilbert1(ctx, depth-1, -size, -size, size/2, -1, true);
-                    hilbert1(ctx, depth-1, -size, +size, size/2, 0, false);
-                    hilbert1(ctx, depth-1, +size, +size, size/2, 0, false);
-                    hilbert1(ctx, depth-1, +size, -size, size/2, +1, true);
+                    let h = []
+                    h = h.concat(
+                        hilbert1(depth-1,
+                                 {x: center.x - x.x/2 + y.x/2, y: center.y - x.y/2 + y.y/2 },
+                                 {x: -x.y/2, y: -x.x/2},
+                                 {x: -y.y/2, y: -y.x/2}));
+                    h = h.concat(
+                        hilbert1(depth-1,
+                                 {x: center.x - x.x/2 - y.x/2, y: center.y - x.y/2 - y.y/2 },
+                                 {x: +x.x/2, y: +x.y/2},
+                                 {x: +y.x/2, y: +y.y/2}));
+                    h = h.concat(
+                        hilbert1(depth-1,
+                                 {x: center.x + x.x/2 - y.x/2, y: center.y + x.y/2 - y.y/2 },
+                                 {x: +x.x/2, y: +x.y/2},
+                                 {x: +y.x/2, y: +y.y/2}));
+                    h = h.concat(
+                        hilbert1(depth-1,
+                                 {x: center.x + x.x/2 + y.x/2, y: center.y + x.y/2 + y.y/2 },
+                                 {x: +x.y/2, y: +x.x/2},
+                                 {x: +y.y/2, y: +y.x/2}));
+                    return h
                 }
-                ctx.restore();
-
-                
             }
 
         </script>
@@ -58,5 +85,5 @@
     </body>
 </html>
 <!--
-  vim: tw=79
+  vim: tw=99
   -->
